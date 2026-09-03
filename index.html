@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Tras las Pistas del Proceso Gráfico</title>
+<meta name="theme-color" content="#5b4b8a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,500;1,600;1,700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link id="app-icon" rel="icon" href="">
+<link id="app-manifest" rel="manifest" href="">
+<style>
+:root{
+  --lavanda:#cdbde9;
+  --celeste:#a6d2ec;
+  --melocoton:#ffd8b3;
+  --violeta:#5b4b8a;
+  --violeta-profundo:#3a2e4d;
+  --azul-estructura:#2f5b8a;
+  --naranja-acento:#e07b3d;
+  --tinta:#3a2e4d;
+  --crema:#fffaf3;
+  --exito:#3f7d5c;
+  --error:#a8483f;
+  --sombra-suave:0 18px 45px rgba(74,56,104,.22);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Lora',Georgia,'Times New Roman',serif;
+  color:var(--tinta);
+  background:
+    radial-gradient(ellipse 60% 40% at 15% 8%, rgba(255,216,179,.55), transparent 60%),
+    radial-gradient(ellipse 55% 45% at 85% 12%, rgba(166,210,236,.55), transparent 60%),
+    radial-gradient(ellipse 70% 60% at 50% 100%, rgba(205,189,233,.6), transparent 65%),
+    linear-gradient(180deg,#f3ecf9 0%,#eaf2f8 35%,#f7e9dc 100%);
+  background-attachment:fixed;
+  min-height:100vh;
+  position:relative;
+  overflow-x:hidden;
+}
+h1,h2,h3,.font-display{
+  font-family:'Playfair Display',Georgia,'Times New Roman',serif;
+  font-style:italic;
+  font-weight:700;
+  color:var(--violeta-profundo);
+}
+.brumas{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.silueta{position:absolute;opacity:.09;filter:blur(.4px);animation:derivar 46s ease-in-out infinite;}
+.silueta.s2{animation-duration:60s;animation-delay:-8s;opacity:.07;}
+.silueta.s3{animation-duration:52s;animation-delay:-20s;opacity:.06;}
+.silueta.s4{animation-duration:70s;animation-delay:-30s;opacity:.08;}
+@keyframes derivar{
+  0%{transform:translate(0,0) rotate(0deg);}
+  50%{transform:translate(24px,-18px) rotate(3deg);}
+  100%{transform:translate(0,0) rotate(0deg);}
+}
+.capa{position:relative;z-index:1;}
+.navbar-caso{
+  background:rgba(255,250,243,.72);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(91,75,138,.18);
+  box-shadow:0 6px 24px rgba(74,56,104,.08);
+}
+.navbar-caso .brand-title{font-family:'Playfair Display',serif;font-style:italic;color:var(--violeta-profundo);font-size:1.05rem;}
+.paso-punto{
+  width:34px;height:34px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(91,75,138,.12);
+  color:var(--violeta-profundo);
+  font-family:'Lora',serif;font-weight:600;font-size:.85rem;
+  border:2px solid rgba(91,75,138,.25);
+  transition:all .4s ease;
+}
+.paso-punto.completo{background:var(--exito);border-color:var(--exito);color:#fff;}
+.paso-punto.activo{background:var(--naranja-acento);border-color:var(--naranja-acento);color:#fff;box-shadow:0 0 0 5px rgba(224,123,61,.22);}
+.hero{
+  padding:5.5rem 0 4rem;
+  text-align:center;
+  position:relative;
+}
+.hero .lupa-decor{
+  width:74px;height:74px;margin:0 auto 1.2rem;
+  opacity:.85;
+}
+.hero h1{font-size:clamp(2.1rem,5vw,3.4rem);margin-bottom:.6rem;}
+.hero .subt{font-size:1.15rem;color:var(--violeta);font-style:italic;font-family:'Playfair Display',serif;}
+.hero .institucional{
+  margin-top:1.6rem;font-size:.92rem;color:var(--tinta);opacity:.85;
+  font-family:'Lora',serif;
+}
+.tarjeta-bruma{
+  background:rgba(255,250,244,.72);
+  backdrop-filter:blur(14px);
+  border:1px solid rgba(91,75,138,.16);
+  border-radius:26px;
+  box-shadow:var(--sombra-suave);
+}
+.seccion-caso{
+  padding:3.4rem 0;
+  scroll-margin-top:90px;
+}
+.seccion-caso.bloqueado{
+  opacity:.4;filter:blur(1.5px) grayscale(.4);pointer-events:none;user-select:none;
+}
+.chip-fase{
+  display:inline-block;padding:.35rem 1rem;border-radius:999px;
+  font-family:'Playfair Display',serif;font-style:italic;font-weight:600;
+  background:linear-gradient(135deg,var(--celeste),var(--lavanda));
+  color:var(--violeta-profundo);font-size:.9rem;
+}
+.rotulo-caso{
+  text-transform:uppercase;letter-spacing:.14em;font-size:.78rem;
+  color:var(--naranja-acento);font-weight:600;font-family:'Lora',serif;
+}
+.pista-card{
+  background:var(--crema);
+  border:1px solid rgba(91,75,138,.2);
+  border-radius:18px;
+  padding:1rem 1.1rem;
+  box-shadow:0 8px 20px rgba(74,56,104,.12);
+  cursor:grab;
+  transition:transform .25s ease, box-shadow .25s ease;
+  font-size:.94rem;
+}
+.pista-card:active{cursor:grabbing;}
+.pista-card.seleccionada{
+  outline:3px solid var(--naranja-acento);
+  transform:translateY(-3px);
+}
+.pista-card.falsa-marcada{border-color:var(--error);}
+.pista-card small{display:block;color:var(--violeta);opacity:.7;margin-top:.3rem;font-style:italic;}
+.zona-drop{
+  min-height:140px;border:2px dashed rgba(91,75,138,.4);
+  border-radius:20px;padding:.9rem;background:rgba(255,255,255,.35);
+  transition:background .2s ease,border-color .2s ease;
+}
+.zona-drop.hover-activo{background:rgba(224,123,61,.15);border-color:var(--naranja-acento);}
+.zona-drop h6{font-family:'Playfair Display',serif;font-style:italic;color:var(--violeta-profundo);}
+.suspect-card{
+  border:2px solid rgba(91,75,138,.2);border-radius:20px;padding:1.1rem;
+  background:var(--crema);cursor:pointer;transition:all .25s ease;height:100%;
+}
+.suspect-card:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(74,56,104,.18);}
+.suspect-card.elegido{border-color:var(--naranja-acento);box-shadow:0 0 0 4px rgba(224,123,61,.18);}
+.suspect-card .icono{font-size:2rem;}
+.panel-feedback{
+  border-radius:20px;padding:1.2rem 1.4rem;margin-top:1.1rem;
+  font-size:.96rem;line-height:1.55;
+}
+.panel-feedback.acierto{background:rgba(63,125,92,.13);border:1px solid rgba(63,125,92,.4);color:#2c5c42;}
+.panel-feedback.error{background:rgba(168,72,63,.1);border:1px solid rgba(168,72,63,.35);color:#7c342c;}
+.panel-feedback .paso-fb{margin-bottom:.4rem;}
+.panel-feedback .paso-fb b{color:var(--violeta-profundo);}
+.badge-fase-final{
+  background:linear-gradient(135deg,var(--azul-estructura),var(--violeta));
+  color:#fff;border-radius:16px;padding:.6rem 1.1rem;font-family:'Playfair Display',serif;font-style:italic;
+}
+.flecha-metodo{color:var(--naranja-acento);font-size:1.4rem;align-self:center;}
+.btn-detective{
+  background:linear-gradient(135deg,var(--naranja-acento),#c85f2c);
+  border:none;color:#fff;border-radius:999px;padding:.6rem 1.6rem;
+  box-shadow:0 10px 22px rgba(224,123,61,.35);font-family:'Lora',serif;font-weight:600;
+}
+.btn-detective:hover{color:#fff;transform:translateY(-2px);box-shadow:0 14px 28px rgba(224,123,61,.42);}
+.btn-detective:disabled{opacity:.5;box-shadow:none;transform:none;}
+.btn-secundario-det{
+  background:transparent;border:1.5px solid var(--violeta);color:var(--violeta-profundo);
+  border-radius:999px;padding:.55rem 1.4rem;font-family:'Lora',serif;
+}
+.insignia{
+  display:inline-flex;align-items:center;gap:.4rem;
+  background:rgba(255,255,255,.6);border:1px solid rgba(91,75,138,.25);
+  border-radius:999px;padding:.35rem .9rem;font-size:.82rem;color:var(--violeta-profundo);
+}
+.slot-secuencia{
+  min-height:70px;border:2px dashed rgba(91,75,138,.4);border-radius:16px;
+  display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.35);
+  font-family:'Playfair Display',serif;font-style:italic;
+}
+.slot-secuencia.ocupado{border-style:solid;background:rgba(166,210,236,.3);}
+.matriz-tabla th,.matriz-tabla td{text-align:center;vertical-align:middle;}
+.matriz-tabla th{font-family:'Playfair Display',serif;font-style:italic;font-weight:600;color:var(--violeta-profundo);}
+.mini-mosaic-frame{
+  border:6px solid var(--crema);border-radius:14px;box-shadow:0 10px 24px rgba(74,56,104,.2);
+  background:#dfe9f2;
+}
+footer.pie-inst{
+  background:linear-gradient(135deg,var(--violeta-profundo),#241d33);
+  color:#f2ecf9;padding:2.2rem 0;margin-top:3rem;text-align:center;
+}
+footer.pie-inst p{margin:.15rem 0;font-size:.92rem;}
+footer.pie-inst .inst-nombre{font-family:'Playfair Display',serif;font-style:italic;font-size:1.05rem;}
+.table-responsive{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;}
+.equipo-tabla input{background:rgba(255,255,255,.65);border:1px solid rgba(91,75,138,.3);min-width:120px;}
+.equipo-tabla input:focus{border-color:var(--naranja-acento);box-shadow:0 0 0 .18rem rgba(224,123,61,.2);}
+.badge-caso-final{
+  width:120px;height:120px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, var(--melocoton), var(--violeta) 75%);
+  display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;
+  box-shadow:var(--sombra-suave);
+}
+.btn-ayuda{
+  display:inline-flex;align-items:center;gap:.35rem;
+  background:rgba(255,216,179,.4);border:1px solid rgba(224,123,61,.5);
+  color:var(--violeta-profundo);border-radius:999px;padding:.35rem 1rem;
+  font-family:'Lora',serif;font-size:.85rem;margin-top:.5rem;
+  transition:background .2s ease,transform .2s ease;
+}
+.btn-ayuda:hover{background:rgba(255,216,179,.65);transform:translateY(-1px);}
+.overlay-detective{
+  position:fixed;inset:0;z-index:1200;
+  background:rgba(58,46,77,.55);backdrop-filter:blur(4px);
+  display:flex;align-items:center;justify-content:center;padding:1.2rem;
+  opacity:0;pointer-events:none;transition:opacity .25s ease;
+}
+.overlay-detective.abierta{opacity:1;pointer-events:auto;}
+.panel-emergente{
+  position:relative;max-width:520px;width:100%;padding:1.8rem 1.6rem;
+  transform:translateY(14px) scale(.97);transition:transform .25s ease;
+  max-height:85vh;overflow-y:auto;
+}
+.overlay-detective.abierta .panel-emergente{transform:translateY(0) scale(1);}
+.cerrar-emergente{
+  position:absolute;top:.7rem;right:.9rem;background:none;border:none;
+  font-size:1.6rem;line-height:1;color:var(--violeta-profundo);cursor:pointer;
+}
+.btn-glosario-flotante{
+  position:fixed;bottom:1.4rem;right:1.4rem;z-index:1100;
+  background:linear-gradient(135deg,var(--violeta),var(--azul-estructura));
+  color:#fff;border:none;border-radius:999px;padding:.7rem 1.3rem;
+  font-family:'Playfair Display',serif;font-style:italic;font-weight:600;
+  box-shadow:0 12px 28px rgba(47,91,138,.4);
+}
+.btn-glosario-flotante:hover{transform:translateY(-2px);}
+.glosario-lista dt{
+  font-family:'Playfair Display',serif;font-style:italic;font-weight:700;
+  color:var(--violeta-profundo);margin-top:.7rem;
+}
+.glosario-lista dd{margin-bottom:0;font-size:.94rem;}
+@media (max-width:576px){
+  .btn-glosario-flotante{padding:.6rem 1rem;font-size:.85rem;bottom:1rem;right:1rem;}
+  .hero{padding:3.5rem 0 2.5rem;}
+  .seccion-caso{padding:2.2rem 0;}
+  .flecha-metodo{transform:rotate(90deg);}
+}
+@media print{
+  .navbar-caso,.brumas,.btn-detective,.btn-secundario-det,.seccion-caso:not(#expediente-imprimible),footer.pie-inst,.no-imprimir{display:none !important;}
+  #expediente-imprimible{display:block !important;filter:none !important;opacity:1 !important;}
+  body{background:#fff;}
+}
+</style>
+</head>
+<body>
+
+<div class="brumas" aria-hidden="true">
+  <svg class="silueta s1" style="top:8%;left:4%;width:90px;" viewBox="0 0 100 100"><circle cx="38" cy="38" r="22" fill="none" stroke="#3a2e4d" stroke-width="6"/><line x1="55" y1="55" x2="82" y2="82" stroke="#3a2e4d" stroke-width="8" stroke-linecap="round"/></svg>
+  <svg class="silueta s2" style="top:18%;right:6%;width:110px;" viewBox="0 0 120 80"><path d="M10 70 Q10 20 60 20 Q110 20 110 70 Z" fill="#3a2e4d"/><rect x="40" y="12" width="40" height="14" rx="4" fill="#3a2e4d"/></svg>
+  <svg class="silueta s3" style="bottom:22%;left:8%;width:70px;" viewBox="0 0 100 60"><ellipse cx="25" cy="30" rx="14" ry="9" fill="#3a2e4d"/><ellipse cx="60" cy="20" rx="14" ry="9" fill="#3a2e4d"/></svg>
+  <svg class="silueta s4" style="bottom:12%;right:10%;width:80px;" viewBox="0 0 100 100"><rect x="15" y="25" width="70" height="50" rx="4" fill="none" stroke="#3a2e4d" stroke-width="5"/><path d="M15 25 L50 55 L85 25" fill="none" stroke="#3a2e4d" stroke-width="5"/></svg>
+</div>
+
+<nav class="navbar navbar-caso sticky-top py-2">
+  <div class="container d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <img src="Logo_IDCsinfondo.png" width="200" height="75" alt=""/><span class="brand-title"> Tras las Pistas del Proceso Gráfico</span>
+    <div class="d-flex gap-2 flex-wrap" id="stepper">
+      <span class="paso-punto" data-paso="1">1</span>
+      <span class="paso-punto" data-paso="2">2</span>
+      <span class="paso-punto" data-paso="3">3</span>
+      <span class="paso-punto" data-paso="4">4</span>
+      <span class="paso-punto" data-paso="5">5</span>
+      <span class="paso-punto" data-paso="6">F</span>
+    </div>
+  </div>
+  <div class="progress mx-3" style="height:5px;border-radius:0;" role="progressbar" aria-label="Progreso de la investigación" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+    <div id="barra-progreso" class="progress-bar" style="width:0%;background:linear-gradient(90deg,var(--naranja-acento),var(--violeta));"></div>
+  </div>
+</nav>
+
+<main class="capa">
+
+<section class="hero capa" id="inicio">
+  <div class="container">
+    <svg class="lupa-decor" viewBox="0 0 100 100"><circle cx="40" cy="40" r="26" fill="none" stroke="#5b4b8a" stroke-width="7"/><line x1="60" y1="60" x2="88" y2="88" stroke="#5b4b8a" stroke-width="9" stroke-linecap="round"/></svg>
+    <h1>Tras las Pistas del Proceso Gráfico</h1>
+    <p class="subt">Una investigación al estilo Sherlock Holmes sobre diseño, impresión y publicación</p>
+    <p class="institucional">
+      Instituto de Educación Superior Pública "Diseño y Comunicación"<br>
+      Unidad didáctica de Producción y publicación de piezas gráficas
+    </p>
+    <div class="tarjeta-bruma mx-auto mt-4 p-4 text-start" style="max-width:760px;">
+      <p class="mb-2"><strong>El caso comienza así:</strong></p>
+      <p class="mb-0">Un estudio de diseño ha extraviado el orden exacto de un proyecto gráfico. Quedan solo fragmentos de evidencia: bocetos, archivos, formatos y canales de publicación, todos mezclados. Sherlock Holmes no memoriza soluciones: observa, pregunta, relaciona y deduce. Tu misión es la misma. Cinco casos te esperan, cada uno con una pista distinta del método del detective. Al final, reconstruirás el expediente completo del proceso: <em>diseño → impresión → publicación</em>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="capa" id="equipo">
+  <div class="container">
+    <div class="tarjeta-bruma p-4 p-md-5">
+      <p class="rotulo-caso">Antes de comenzar</p>
+      <h2 class="h3 mb-3">👥 Registro del equipo investigador</h2>
+      <p>Formen un equipo de 2 integrantes para enfrentar el caso juntos. Completen sus datos; quedarán registrados en el expediente final.</p>
+      <div class="table-responsive equipo-tabla">
+        <table class="table align-middle">
+          <thead>
+            <tr><th>N.°</th><th>Nombres</th><th>Apellidos</th><th>Correo electrónico</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td><input type="text" class="form-control form-control-sm" id="eq1-nombres" placeholder="Nombres"></td>
+              <td><input type="text" class="form-control form-control-sm" id="eq1-apellidos" placeholder="Apellidos"></td>
+              <td><input type="email" class="form-control form-control-sm" id="eq1-correo" placeholder="correo@ejemplo.com"></td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td><input type="text" class="form-control form-control-sm" id="eq2-nombres" placeholder="Nombres"></td>
+              <td><input type="text" class="form-control form-control-sm" id="eq2-apellidos" placeholder="Apellidos"></td>
+              <td><input type="email" class="form-control form-control-sm" id="eq2-correo" placeholder="correo@ejemplo.com"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <button class="btn btn-detective" id="btn-iniciar">Aceptar el caso e iniciar la investigación</button>
+    </div>
+  </div>
+</section>
+
+<section class="seccion-caso capa" id="caso1">
+  <div class="container">
+    <div class="tarjeta-bruma p-4 p-md-5">
+      <p class="rotulo-caso">Caso 1 · La primera deducción</p>
+      <h2 class="h3">Identificación y relación de pistas</h2>
+      <p><strong>Instrucción:</strong> Holmes recibió cinco notas sobre un mismo proyecto gráfico. Solo tres son evidencia real; las otras dos son ruido de investigación. Arrastra (o toca y luego toca el destino) cada pista hacia la fase del proceso que le corresponde, o descártala si no aporta nada al caso.</p>
+      <button type="button" class="btn-ayuda no-imprimir" data-pista="1">💡 Pedir una pista al docente</button>
+      <div class="row g-3 mt-2" id="pistas-origen-caso1"></div>
+      <div class="row g-3 mt-4">
+        <div class="col-md-3 col-6">
+          <div class="zona-drop" data-zona="diseno"><h6>🖌️ Diseño</h6><div class="contenido-zona"></div></div>
+        </div>
+        <div class="col-md-3 col-6">
+          <div class="zona-drop" data-zona="impresion"><h6>🖨️ Impresión</h6><div class="contenido-zona"></div></div>
+        </div>
+        <div class="col-md-3 col-6">
+          <div class="zona-drop" data-zona="publicacion"><h6>📡 Publicación</h6><div class="contenido-zona"></div></div>
+        </div>
+        <div class="col-md-3 col-6">
+          <div class="zona-drop" data-zona="descartar"><h6>🗑️ Descartar</h6><div class="contenido-zona"></div></div>
+        </div>
+      </div>
+      <button class="btn btn-detective mt-4" id="btn-confirmar-caso1">Confirmar deducción</button>
+      <div id="feedback-caso1"></div>
+      <div id="siguiente-caso1" class="mt-3" style="display:none;">
+        <span class="chip-fase">Deducción registrada en el expediente</span>
+        <div class="mt-3"><button class="btn btn-secundario-det" id="btn-siguiente1">Continuar al Caso 2 →</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="seccion-caso bloqueado capa" id="caso2">
+  <div class="container">
+    <div class="tarjeta-bruma p-4 p-md-5">
+      <p class="rotulo-caso">Caso 2 · Un problema iluminador</p>
+      <h2 class="h3">Deducción del formato</h2>
+      <p><strong>Instrucción:</strong> Holmes no puede observar el archivo directamente, solo cuenta con una descripción técnica. Como buen detective, debes deducir el formato sin que nadie te lo diga.</p>
+      <div class="tarjeta-bruma p-3 mb-3" style="background:rgba(166,210,236,.25);">
+        <em>«Este recurso debe conservar sus formas y líneas cuando cambia de tamaño, y será utilizado para producir una pieza impresa.»</em>
+      </div>
+      <p><strong>Pregunta del detective:</strong> ¿Qué formato se deduce a partir de esta evidencia?</p>
+      <button type="button" class="btn-ayuda no-imprimir" data-pista="2">💡 Pedir una pista al docente</button>
+      <div class="row g-3 mt-2" id="sospechosos-caso2">
+        <div class="col-md-4">
+          <div class="suspect-card" data-valor="vectorial">
+            <div class="icono">📐</div>
+            <h6 class="mt-2 mb-1">Vectorial</h6>
+            <small>Se construye con puntos, líneas y curvas matemáticas (paths).</small>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="suspect-card" data-valor="raster">
+            <div class="icono">🖼️</div>
+            <h6 class="mt-2 mb-1">Ráster</h6>
+            <small>Se compone de una cuadrícula fija de píxeles con color propio.</small>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="suspect-card" data-valor="video">
+            <div class="icono">🎬</div>
+            <h6 class="mt-2 mb-1">Video</h6>
+            <small>Es una secuencia de fotogramas en movimiento.</small>
+          </div>
+        </div>
+      </div>
+      <label class="form-label mt-3">Justifica tu elección, detective:</label>
+      <textarea class="form-control" id="justificacion-caso2" rows="2" placeholder="Escribe aquí tu razonamiento..."></textarea>
+      <button class="btn btn-detective mt-3" id="btn-confirmar-caso2">Resolver el caso</button>
+      <div id="feedback-caso2"></div>
+      <div id="revelacion-caso2" style="display:none;" class="tarjeta-bruma p-3 mt-3">
+        <p class="mb-1"><strong>Por qué las otras pistas no encajan:</strong></p>
+        <ul class="mb-0">
+          <li><strong>Ráster</strong> pierde definición al ampliarse, porque su información está fija en una cuadrícula de píxeles.</li>
+          <li><strong>Video</strong> implica movimiento en el tiempo; esta pista describe un recurso estático destinado a impresión.</li>
+        </ul>
+      </div>
+      <div id="siguiente-caso2" class="mt-3" style="display:none;">
+        <button class="btn btn-secundario-det" id="btn-siguiente2">Continuar al Caso 3 →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="seccion-caso bloqueado capa" id="caso3">
+  <div class="container">
+    <div class="tarjeta-bruma p-4 p-md-5">
+      <p class="rotulo-caso">Caso 3 · El engaño del dominó</p>
+      <h2 class="h3">Reconstrucción del proceso</h2>
+      <p><strong>Instrucción:</strong> Igual que Holmes dedujo el orden de una cadena de dominós sin verla armarse, debes reconstruir la secuencia del proceso gráfico a partir de las relaciones entre sus elementos.</p>
+      <button type="button" class="btn-ayuda no-imprimir" data-pista="3">💡 Pedir una pista al docente</button>
+      <p class="fw-semibold mb-2 mt-3">Paso A · Ordena la cadena del proceso</p>
+      <div class="row g-3" id="fichas-secuencia-origen"></div>
+      <div class="row g-3 mt-1">
+        <div class="col-md-4"><div class="slot-secuencia" data-slot="0">Posición 1</div></div>
+        <div class="col-md-4"><div class="slot-secuencia" data-slot="1">Posición 2</div></div>
+        <div class="col-md-4"><div class="slot-secuencia" data-slot="2">Posición 3</div></div>
+      </div>
+
+      <p class="fw-semibold mb-2 mt-4">Paso B · Relaciona cada formato con la(s) fase(s) donde interviene</p>
+      <div class="table-responsive">
+        <table class="table matriz-tabla">
+          <thead><tr><th>Formato</th><th>Diseño</th><th>Impresión</th><th>Publicación</th></tr></thead>
+          <tbody>
+            <tr><td class="text-start">Vectorial</td><td><input type="checkbox" class="form-check-input matriz-check" data-formato="vectorial" data-fase="diseno"></td><td><input type="checkbox" class="form-check-input matriz-check" data-formato="vectorial" data-fase="impresion"></td><td><input type="checkbox" class="form-check-input matriz-check" data-formato="vectorial" data-fase="publicacion"></td></tr>
+            <tr><td class="text-start">Ráster</td><td><input type="checkbox" class="form-check-input matriz-check" data-formato="raster" data-fase="diseno"></td><td><input type="checkbox" class="form-check-input matriz-check" data-formato="raster" data-fase="impresion"></td><td><input type="checkbox" class="form-check-input matriz-check" data-formato="raster" data-fase="publicacion"></td></tr>
+            <tr><td class="text-start">Video</td><td><input type="checkbox" class="form-check-input matriz-check" data-formato="video" data-fase="diseno"></td><td><input type="checkbox" class="form-check-input matriz-check" data-formato="video" data-fase="impresion"></td><td><input type="checkbox" class="form-check-input matriz-check" data-formato="video" data-fase="publicacion"></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <button class="btn btn-detective mt-2" id="btn-confirmar-caso3">Confirmar reconstrucción</button>
+      <div id="feedback-caso3"></div>
+      <div id="siguiente-caso3" class="mt-3" style="display:none;">
+        <button class="btn btn-secundario-det" id="btn-siguiente3">Continuar al Caso 4 →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="seccion-caso bloqueado capa" id="caso4">
+  <div class="container">
+    <div class="tarjeta-bruma p-4 p-md-5">
+      <p class="rotulo-caso">Caso 4 · Una historia probable</p>
+      <h2 class="h3">Detectar el error</h2>
+      <p><strong>Instrucción:</strong> Un testigo relata lo siguiente. Holmes sabe que una historia puede sonar razonable y aun así esconder una contradicción técnica.</p>
+      <div class="tarjeta-bruma p-3 mb-3" style="background:rgba(255,216,179,.3);">
+        <em>«El diseñador prepara una fotografía ráster para imprimirla en gran formato. Para evitar pérdida de calidad, aumenta el tamaño de la imagen varias veces sin modificar su resolución.»</em>
+      </div>
+
+      <p class="fw-semibold mb-1">Laboratorio del detective: simulador de ampliación</p>
+      <p class="mb-2">Mueve el control y observa qué le ocurre a un recurso ráster cuando se amplía sin ajustar su resolución.</p>
+      <div class="d-flex flex-column align-items-center mb-3">
+        <canvas id="canvasSimulador" width="220" height="220" class="mini-mosaic-frame"></canvas>
+        <input type="range" min="100" max="400" step="10" value="100" id="rango-simulador" class="form-range mt-3" style="max-width:320px;">
+        <span id="valorEscala" class="chip-fase mt-1">100% — nítido para su tamaño original</span>
+      </div>
+
+      <p><strong>Pregunta del caso:</strong> ¿Qué evidencia permite detectar el problema?</p>
+      <button type="button" class="btn-ayuda no-imprimir" data-pista="4">💡 Pedir una pista al docente</button>
+      <div class="d-flex flex-column gap-2 mt-2" id="opciones-caso4">
+        <label class="tarjeta-bruma p-2 px-3"><input type="radio" name="op4" value="a"> El diseñador trabaja de noche.</label>
+        <label class="tarjeta-bruma p-2 px-3"><input type="radio" name="op4" value="b"> La imagen se amplía sin ajustar la resolución, lo que provoca pérdida de definición.</label>
+        <label class="tarjeta-bruma p-2 px-3"><input type="radio" name="op4" value="c"> El archivo se guardó en la carpeta equivocada.</label>
+        <label class="tarjeta-bruma p-2 px-3"><input type="radio" name="op4" value="d"> El cliente cambió de opinión sobre el color.</label>
+      </div>
+      <button class="btn btn-detective mt-3" id="btn-confirmar-caso4">Presentar la evidencia</button>
+      <div id="feedback-caso4"></div>
+      <div id="siguiente-caso4" class="mt-3" style="display:none;">
+        <button class="btn btn-secundario-det" id="btn-siguiente4">Continuar al Caso 5 →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="seccion-caso bloqueado capa" id="caso5">
+  <div class="container">
+    <div class="tarjeta-bruma p-4 p-md-5">
+      <p class="rotulo-caso">Caso 5 · Un mensaje codificado</p>
+      <h2 class="h3">Interpretación para publicación digital</h2>
+      <p><strong>Instrucción:</strong> Un mensaje llegó con el orden alterado. Reorganiza los fragmentos para descifrarlo.</p>
+      <button type="button" class="btn-ayuda no-imprimir" data-pista="5a">💡 Pedir una pista al docente</button>
+      <div class="row g-3 mt-2" id="fragmentos-origen-caso5"></div>
+      <div class="row g-2 mt-1">
+        <div class="col-md-3 col-6"><div class="slot-secuencia" data-slot5="0">1</div></div>
+        <div class="col-md-3 col-6"><div class="slot-secuencia" data-slot5="1">2</div></div>
+        <div class="col-md-3 col-6"><div class="slot-secuencia" data-slot5="2">3</div></div>
+        <div class="col-md-3 col-6"><div class="slot-secuencia" data-slot5="3">4</div></div>
+      </div>
+      <button class="btn btn-detective mt-3" id="btn-confirmar-caso5a">Descifrar el mensaje</button>
+      <div id="feedback-caso5a"></div>
+
+      <div id="bloque-anagrama" style="display:none;">
+        <hr class="my-4">
+        <p class="fw-semibold mb-1">Refuerzo del detective: el término clave</p>
+        <p>Pista: fase en la que el recurso llega finalmente a su público, a través de un canal físico o digital.</p>
+        <button type="button" class="btn-ayuda no-imprimir" data-pista="5b">💡 Pedir una pista extra al docente</button>
+        <p class="chip-fase mt-2" id="anagrama-mezclado" style="font-size:1.1rem;letter-spacing:.15em;"></p>
+        <div class="d-flex gap-2 flex-wrap align-items-center">
+          <input type="text" class="form-control" id="input-anagrama" style="max-width:280px;" placeholder="Escribe la palabra...">
+          <button class="btn btn-detective" id="btn-confirmar-anagrama">Verificar</button>
+        </div>
+        <div id="feedback-anagrama"></div>
+      </div>
+
+      <div id="siguiente-caso5" class="mt-3" style="display:none;">
+        <button class="btn btn-secundario-det" id="btn-siguiente5">Abrir el expediente final →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="seccion-caso bloqueado capa" id="casofinal">
+  <div class="container">
+    <div class="tarjeta-bruma p-4 p-md-5" id="expediente-imprimible">
+      <p class="rotulo-caso">Caso final · El expediente Sherlock Holmes</p>
+      <h2 class="h3 mb-4">Integración de la investigación</h2>
+
+      <div class="badge-caso-final no-imprimir">🔍</div>
+
+      <p class="fw-semibold">Método del detective aplicado a este caso</p>
+      <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
+        <span class="badge-fase-final">Pistas</span><span class="flecha-metodo">→</span>
+        <span class="badge-fase-final">Análisis</span><span class="flecha-metodo">→</span>
+        <span class="badge-fase-final">Deducción</span><span class="flecha-metodo">→</span>
+        <span class="badge-fase-final">Decisión</span><span class="flecha-metodo">→</span>
+        <span class="badge-fase-final">Fase del proceso</span>
+      </div>
+
+      <p class="fw-semibold">Proceso reconstruido</p>
+      <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
+        <span class="chip-fase">🖌️ Diseño</span><span class="flecha-metodo">→</span>
+        <span class="chip-fase">🖨️ Impresión</span><span class="flecha-metodo">→</span>
+        <span class="chip-fase">📡 Publicación</span>
+      </div>
+
+      <p class="fw-semibold">Galería de sospechosos: los formatos</p>
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <div class="tarjeta-bruma p-3 h-100">
+            <h6>📐 Vectorial</h6>
+            <p class="mb-0 small">Interviene en <strong>Diseño</strong> e <strong>Impresión</strong>. Conserva nitidez a cualquier tamaño porque se define por ecuaciones matemáticas.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="tarjeta-bruma p-3 h-100">
+            <h6>🖼️ Ráster</h6>
+            <p class="mb-0 small">Interviene en <strong>Diseño</strong> y <strong>Publicación</strong>. Su calidad depende de una resolución fija en píxeles.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="tarjeta-bruma p-3 h-100">
+            <h6>🎬 Video</h6>
+            <p class="mb-0 small">Interviene en <strong>Publicación</strong>. Es la única evidencia con movimiento en el tiempo.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="no-imprimir">
+        <p class="fw-semibold">Transferencia y reflexión</p>
+        <label class="form-label">¿Dónde usarías este razonamiento en tu futuro trabajo como diseñador o comunicador?</label>
+        <textarea class="form-control mb-3" id="reflexion-transferencia" rows="2"></textarea>
+        <label class="form-label">Dos hallazgos y una duda que te deja este caso:</label>
+        <textarea class="form-control mb-3" id="reflexion-hallazgos" rows="2"></textarea>
+
+        <p class="fw-semibold mb-2">Autoevaluación del detective (1 = inicial · 4 = dominado)</p>
+        <div class="row g-3 mb-3" id="autoevaluacion">
+          <div class="col-md-3 col-6"><label class="form-label small">Observación</label><input type="range" min="1" max="4" value="2" class="form-range" data-rubrica="observacion"></div>
+          <div class="col-md-3 col-6"><label class="form-label small">Preguntas</label><input type="range" min="1" max="4" value="2" class="form-range" data-rubrica="preguntas"></div>
+          <div class="col-md-3 col-6"><label class="form-label small">Deducción</label><input type="range" min="1" max="4" value="2" class="form-range" data-rubrica="deduccion"></div>
+          <div class="col-md-3 col-6"><label class="form-label small">Decisión</label><input type="range" min="1" max="4" value="2" class="form-range" data-rubrica="decision"></div>
+        </div>
+
+        <button class="btn btn-detective" id="btn-cerrar-expediente">Cerrar el expediente</button>
+        <button class="btn btn-secundario-det ms-2" id="btn-imprimir" style="display:none;">🖨️ Imprimir / guardar como PDF</button>
+        <button class="btn btn-secundario-det ms-2" id="btn-markdown" style="display:none;">📄 Descargar expediente (.md)</button>
+      </div>
+
+      <div id="resumen-expediente" style="display:none;" class="tarjeta-bruma p-3 mt-4">
+        <h6 class="mb-2">Expediente cerrado</h6>
+        <p class="mb-1" id="resumen-equipo"></p>
+        <p class="mb-1" id="resumen-fecha"></p>
+        <p class="mb-0">Caso resuelto: pistas relacionadas, formato deducido, proceso reconstruido, error detectado, mensaje descifrado e integración completa.</p>
+      </div>
+
+      <div class="no-imprimir mt-4">
+        <button class="btn btn-link p-0" type="button" data-bs-toggle="collapse" data-bs-target="#nota-docente">Nota metodológica para el docente</button>
+        <div class="collapse mt-2" id="nota-docente">
+          <div class="tarjeta-bruma p-3 small">
+            Esta actividad adopta el enfoque DUA-Experiencial porque ofrece múltiples formas de implicación, representación y acción/expresión, mientras organiza el aprendizaje mediante experiencias concretas, reflexión guiada, conceptualización y aplicación. La narrativa de investigación al estilo Sherlock Holmes convierte la clasificación de formatos y fases en decisiones activas, no en información aislada, y sostiene la observación, la formulación de preguntas, la deducción y la toma de decisiones como habilidades transferibles al proceso de diseño, impresión y publicación de piezas gráficas.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie-inst">
+  <img src="Logo_IDCblanco.png" width="221" height="83" alt=""/>
+  <p class="inst-nombre">&nbsp;</p>
+  <p class="inst-nombre">Instituto de Educación Superior Pública "Diseño y Comunicación"</p>
+<p>Docente: Mg Mario Quiroz | Curso: Unidad didáctica de Producción y publicación de piezas gráficas · 2026 · Semana 1</p>
+</footer>
+
+<button type="button" class="btn-glosario-flotante no-imprimir" id="btn-glosario" aria-haspopup="dialog">📖 Glosario</button>
+
+<div class="overlay-detective no-imprimir" id="ventanaEmergente" aria-hidden="true">
+  <div class="panel-emergente tarjeta-bruma" role="dialog" aria-modal="true" aria-labelledby="ventanaEmergenteTitulo">
+    <button type="button" class="cerrar-emergente" id="cerrarVentanaEmergente" aria-label="Cerrar">×</button>
+    <h5 class="font-display" id="ventanaEmergenteTitulo">Pista del detective</h5>
+    <div id="ventanaEmergenteCuerpo"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+(function(){
+  var iconSVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%235b4b8a"/><circle cx="42" cy="42" r="20" fill="none" stroke="%23ffd8b3" stroke-width="8"/><line x1="57" y1="57" x2="80" y2="80" stroke="%23ffd8b3" stroke-width="9" stroke-linecap="round"/></svg>';
+  var iconURI = 'data:image/svg+xml,' + iconSVG;
+  document.getElementById('app-icon').setAttribute('href', iconURI);
+
+  var manifest = {
+    name: 'Tras las Pistas del Proceso Gráfico',
+    short_name: 'Pistas Gráfico',
+    description: 'Investigación al estilo Sherlock Holmes sobre diseño, impresión y publicación de piezas gráficas.',
+    start_url: '.',
+    display: 'standalone',
+    background_color: '#eee5f6',
+    theme_color: '#5b4b8a',
+    orientation: 'portrait-primary',
+    icons: [{ src: iconURI, sizes: 'any', type: 'image/svg+xml', purpose: 'any' }]
+  };
+  var manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+  document.getElementById('app-manifest').setAttribute('href', URL.createObjectURL(manifestBlob));
+
+  if ('serviceWorker' in navigator) {
+    var swCode = [
+      "var CACHE_NAME='pistas-proceso-grafico-v1';",
+      "self.addEventListener('install', function(e){ self.skipWaiting(); });",
+      "self.addEventListener('activate', function(e){ self.clients.claim(); });",
+      "self.addEventListener('fetch', function(e){",
+      "  e.respondWith(",
+      "    caches.open(CACHE_NAME).then(function(cache){",
+      "      return fetch(e.request).then(function(res){",
+      "        cache.put(e.request, res.clone());",
+      "        return res;",
+      "      }).catch(function(){",
+      "        return cache.match(e.request).then(function(cached){",
+      "          return cached || Response.error();",
+      "        });",
+      "      });",
+      "    })",
+      "  );",
+      "});"
+    ].join('\n');
+    var swBlob = new Blob([swCode], { type: 'application/javascript' });
+    var swURL = URL.createObjectURL(swBlob);
+    navigator.serviceWorker.register(swURL).catch(function(){});
+  }
+})();
+
+var estado = {
+  casosCompletos: { 1:false, 2:false, 3:false, 4:false, 5:false, final:false },
+  secuenciaCaso3: [null, null, null],
+  secuenciaCaso5: [null, null, null, null]
+};
+
+function abrirVentana(titulo, htmlCuerpo){
+  document.getElementById('ventanaEmergenteTitulo').textContent = titulo;
+  document.getElementById('ventanaEmergenteCuerpo').innerHTML = htmlCuerpo;
+  var overlay = document.getElementById('ventanaEmergente');
+  overlay.classList.add('abierta');
+  overlay.setAttribute('aria-hidden', 'false');
+}
+function cerrarVentana(){
+  var overlay = document.getElementById('ventanaEmergente');
+  overlay.classList.remove('abierta');
+  overlay.setAttribute('aria-hidden', 'true');
+}
+
+var pistasDocente = {
+  '1': 'Piensa en el momento del proceso: ¿el recurso todavía se está creando, ya se está imprimiendo o se está entregando al público? Dos de las cinco notas no describen ninguna característica de un archivo gráfico: no pertenecen a ninguna fase.',
+  '2': '¿Qué formato pediría una imprenta para ampliar un logotipo sin perder nitidez? Compara cómo se construye cada opción: con ecuaciones matemáticas (paths) o con una cuadrícula fija de píxeles.',
+  '3': 'Para el orden: ¿qué sucede primero, crear la pieza, producirla físicamente o hacerla llegar al público? Para la tabla: piensa qué formato usarías para un logotipo, para una fotografía y para un contenido con movimiento.',
+  '4': 'Observa el simulador: ¿qué le ocurre a la imagen cuando la escala supera el 100% sin cambiar la resolución? Busca la opción que describe ese fenómeno técnico, no una excusa personal.',
+  '5a': '¿Qué recurso se menciona primero? ¿En qué formato se entrega? ¿A través de qué canal llega al público? ¿En qué fase concluye el mensaje?',
+  '5b': 'La palabra mezclada tiene once letras y nombra la última fase del proceso: cuando el recurso ya terminado llega a su público.'
+};
+
+var glosarioHTML =
+  '<dl class="glosario-lista">' +
+    '<dt>Diseño</dt><dd>Fase de creación del recurso gráfico: bocetos, retículas y capas todavía editables.</dd>' +
+    '<dt>Impresión</dt><dd>Fase de reproducción física de la pieza; exige un archivo preparado para imprenta (resolución suficiente, sangrado, marcas de corte).</dd>' +
+    '<dt>Publicación</dt><dd>Fase de distribución final del recurso, a través de un canal físico o digital, para que llegue a su público.</dd>' +
+    '<dt>Vectorial</dt><dd>Formato definido por ecuaciones matemáticas (puntos, líneas y curvas o «paths»). Conserva su nitidez a cualquier tamaño.</dd>' +
+    '<dt>Ráster</dt><dd>Formato compuesto por una cuadrícula fija de píxeles. Su calidad depende de la resolución con la que fue capturado o creado.</dd>' +
+    '<dt>Video</dt><dd>Secuencia de fotogramas en movimiento, usada generalmente en publicación digital.</dd>' +
+    '<dt>Resolución</dt><dd>Cantidad de píxeles por unidad de superficie (dpi o ppi). Determina el nivel de detalle de una imagen ráster.</dd>' +
+    '<dt>Sangrado</dt><dd>Margen adicional que se agrega a un archivo de impresión para evitar bordes blancos al cortar la pieza.</dd>' +
+    '<dt>PDF/X-1a</dt><dd>Estándar de archivo PDF preparado específicamente para impresión profesional.</dd>' +
+    '<dt>dpi / ppi</dt><dd>Puntos o píxeles por pulgada: la unidad con la que se mide la resolución de una imagen.</dd>' +
+  '</dl>';
+
+(function initAyudasYGlosario(){
+  document.querySelectorAll('.btn-ayuda').forEach(function(boton){
+    boton.addEventListener('click', function(){
+      var clave = boton.dataset.pista;
+      abrirVentana('Pista del docente', '<p class="mb-0">' + (pistasDocente[clave] || '') + '</p>');
+    });
+  });
+
+  document.getElementById('btn-glosario').addEventListener('click', function(){
+    abrirVentana('Glosario del expediente', glosarioHTML);
+  });
+
+  document.getElementById('cerrarVentanaEmergente').addEventListener('click', cerrarVentana);
+  document.getElementById('ventanaEmergente').addEventListener('click', function(e){
+    if (e.target === e.currentTarget) cerrarVentana();
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') cerrarVentana();
+  });
+})();
+
+function normalizar(texto){
+  return texto.toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+}
+
+function actualizarProgreso(){
+  var total = 6;
+  var hechos = Object.keys(estado.casosCompletos).filter(function(k){ return estado.casosCompletos[k]; }).length;
+  document.getElementById('barra-progreso').style.width = Math.round((hechos/total)*100) + '%';
+  var mapaPasos = {1:'1',2:'2',3:'3',4:'4',5:'5',final:'6'};
+  Object.keys(mapaPasos).forEach(function(k){
+    var el = document.querySelector('.paso-punto[data-paso="' + mapaPasos[k] + '"]');
+    if (!el) return;
+    el.classList.toggle('completo', !!estado.casosCompletos[k]);
+  });
+}
+
+function desbloquear(idSeccion){
+  var seccion = document.getElementById(idSeccion);
+  seccion.classList.remove('bloqueado');
+  seccion.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function marcarPasoActivo(n){
+  document.querySelectorAll('.paso-punto').forEach(function(p){ p.classList.remove('activo'); });
+  var el = document.querySelector('.paso-punto[data-paso="' + n + '"]');
+  if (el) el.classList.add('activo');
+}
+
+function panelExito(html){
+  return '<div class="panel-feedback acierto">' + html + '</div>';
+}
+function panelError(pista, dato, contexto){
+  return '<div class="panel-feedback error">' +
+    '<p class="paso-fb"><b>Pausa.</b> Aún no, pero vas por buen camino.</p>' +
+    '<p class="paso-fb"><b>Pista.</b> ' + pista + '</p>' +
+    '<p class="paso-fb"><b>Dato clave.</b> ' + dato + '</p>' +
+    '<p class="paso-fb"><b>Contexto.</b> ' + contexto + '</p>' +
+    '<p class="paso-fb mb-0"><b>Reintento.</b> Vuelve a responder con esta pista en mente.</p>' +
+  '</div>';
+}
+
+function habilitarArrastreYToque(items, zonas, alColocar){
+  var seleccionado = null;
+
+  function colocar(item, zona){
+    var exito = alColocar(item, zona);
+    if (exito !== false) {
+      item.classList.remove('seleccionada');
+      seleccionado = null;
+    }
+  }
+
+  items.forEach(function(item){
+    item.setAttribute('draggable', 'true');
+    item.addEventListener('dragstart', function(){
+      item.classList.add('seleccionada');
+    });
+    item.addEventListener('dragend', function(){
+      item.classList.remove('seleccionada');
+    });
+    item.addEventListener('click', function(){
+      if (seleccionado && seleccionado !== item) {
+        var zonaDestino = item.closest('.zona-drop, .slot-secuencia');
+        if (zonaDestino) {
+          colocar(seleccionado, zonaDestino);
+          return;
+        }
+      }
+      if (seleccionado === item) {
+        item.classList.remove('seleccionada');
+        seleccionado = null;
+        return;
+      }
+      items.forEach(function(i){ i.classList.remove('seleccionada'); });
+      item.classList.add('seleccionada');
+      seleccionado = item;
+    });
+  });
+
+  zonas.forEach(function(zona){
+    zona.addEventListener('dragover', function(e){
+      e.preventDefault();
+      zona.classList.add('hover-activo');
+    });
+    zona.addEventListener('dragleave', function(){
+      zona.classList.remove('hover-activo');
+    });
+    zona.addEventListener('drop', function(e){
+      e.preventDefault();
+      zona.classList.remove('hover-activo');
+      var activo = items.find(function(i){ return i.classList.contains('seleccionada'); });
+      if (activo) colocar(activo, zona);
+    });
+    zona.addEventListener('click', function(){
+      if (seleccionado) colocar(seleccionado, zona);
+    });
+  });
+}
+
+var pistasCaso1 = [
+  { id:'p1', texto:'El boceto conserva capas editables y una retícula tipográfica todavía en construcción.', zona:'diseno' },
+  { id:'p2', texto:'El archivo se entrega en PDF/X-1a, con marcas de corte y 3 mm de sangrado.', zona:'impresion' },
+  { id:'p3', texto:'El recurso se optimiza en MP4 vertical para publicarse en redes sociales.', zona:'publicacion' },
+  { id:'p4', texto:'Un vecino aseguró haber visto al mensajero cerca del taller a las 9:00.', zona:'descartar' },
+  { id:'p5', texto:'La factura del proyecto se canceló en efectivo el martes por la tarde.', zona:'descartar' }
+];
+
+(function initCaso1(){
+  var origen = document.getElementById('pistas-origen-caso1');
+  pistasCaso1.forEach(function(p){
+    var col = document.createElement('div');
+    col.className = 'col-md-4 col-sm-6';
+    col.innerHTML = '<div class="pista-card" id="' + p.id + '" data-correcta="' + p.zona + '">' + p.texto + '<small>Arrastra o toca, luego toca la fase</small></div>';
+    origen.appendChild(col);
+  });
+
+  var items = Array.prototype.slice.call(document.querySelectorAll('#caso1 .pista-card'));
+  var zonas = Array.prototype.slice.call(document.querySelectorAll('#caso1 .zona-drop'));
+
+  habilitarArrastreYToque(items, zonas, function(item, zona){
+    zona.querySelector('.contenido-zona').appendChild(item);
+    item.dataset.actual = zona.dataset.zona;
+    return true;
+  });
+
+  document.getElementById('btn-confirmar-caso1').addEventListener('click', function(){
+    var total = pistasCaso1.length;
+    var correctas = 0;
+    items.forEach(function(item){
+      if (item.dataset.actual === item.dataset.correcta) correctas++;
+    });
+    var fb = document.getElementById('feedback-caso1');
+    if (correctas === total) {
+      fb.innerHTML = panelExito('¡Excelente, detective! Has relacionado correctamente las pistas. Esta evidencia permite identificar la fase correspondiente del proceso.');
+      estado.casosCompletos[1] = true;
+      actualizarProgreso();
+      document.getElementById('siguiente-caso1').style.display = 'block';
+    } else {
+      fb.innerHTML = panelError(
+        'La deducción todavía no es correcta. Observa nuevamente la pista y pregúntate: ¿qué ocurre con este recurso durante el proceso?',
+        'Tienes ' + correctas + ' de ' + total + ' pistas bien ubicadas. Dos de las cinco notas son ruido y no pertenecen a ninguna fase.',
+        'Las pistas reales describen características del recurso, el formato del archivo o el canal donde se usará.'
+      );
+    }
+  });
+
+  document.getElementById('btn-siguiente1').addEventListener('click', function(){
+    desbloquear('caso2');
+    marcarPasoActivo('2');
+  });
+})();
+
+(function initCaso2(){
+  var tarjetas = Array.prototype.slice.call(document.querySelectorAll('#sospechosos-caso2 .suspect-card'));
+  var elegido = null;
+  tarjetas.forEach(function(t){
+    t.addEventListener('click', function(){
+      tarjetas.forEach(function(x){ x.classList.remove('elegido'); });
+      t.classList.add('elegido');
+      elegido = t.dataset.valor;
+    });
+  });
+
+  document.getElementById('btn-confirmar-caso2').addEventListener('click', function(){
+    var fb = document.getElementById('feedback-caso2');
+    if (!elegido) {
+      fb.innerHTML = panelError('Primero elige un sospechoso: Vectorial, Ráster o Video.', 'La deducción exige tomar una posición antes de justificarla.', 'Observa la pista sobre la conservación de formas al cambiar de tamaño.');
+      return;
+    }
+    document.getElementById('revelacion-caso2').style.display = 'block';
+    if (elegido === 'vectorial') {
+      fb.innerHTML = panelExito('¡Caso resuelto! La pista principal era la posibilidad de modificar el tamaño sin perder la definición. Has utilizado la evidencia para deducir la respuesta.');
+      estado.casosCompletos[2] = true;
+      actualizarProgreso();
+      document.getElementById('siguiente-caso2').style.display = 'block';
+    } else {
+      fb.innerHTML = panelError(
+        'Observa nuevamente la evidencia. ¿Qué característica diferencia a un gráfico vectorial de una imagen ráster?',
+        'Lo vectorial se define por ecuaciones matemáticas (paths), no por una cuadrícula fija de píxeles.',
+        'Por eso puede ampliarse o reducirse sin perder nitidez, algo esencial antes de enviar un archivo a imprenta.'
+      );
+    }
+  });
+
+  document.getElementById('btn-siguiente2').addEventListener('click', function(){
+    desbloquear('caso3');
+    marcarPasoActivo('3');
+  });
+})();
+
+var fichasCaso3 = [
+  { id:'f1', texto:'🖌️ Diseño', valor:'diseno' },
+  { id:'f2', texto:'🖨️ Impresión', valor:'impresion' },
+  { id:'f3', texto:'📡 Publicación', valor:'publicacion' }
+];
+
+(function initCaso3(){
+  var origen = document.getElementById('fichas-secuencia-origen');
+  var barajadas = fichasCaso3.slice().sort(function(){ return Math.random() - 0.5; });
+  barajadas.forEach(function(f){
+    var col = document.createElement('div');
+    col.className = 'col-md-4 col-sm-6';
+    col.innerHTML = '<div class="pista-card text-center" id="' + f.id + '" data-valor="' + f.valor + '">' + f.texto + '<small>Toca o arrastra a una posición</small></div>';
+    origen.appendChild(col);
+  });
+
+  var items = Array.prototype.slice.call(document.querySelectorAll('#caso3 .pista-card'));
+  var zonas = Array.prototype.slice.call(document.querySelectorAll('#caso3 .slot-secuencia'));
+
+  habilitarArrastreYToque(items, zonas, function(item, zona){
+    if (zona.dataset.contenido) return false;
+    var slotAnterior = item.parentElement.classList.contains('slot-secuencia') ? item.parentElement : null;
+    if (slotAnterior) {
+      slotAnterior.classList.remove('ocupado');
+      slotAnterior.dataset.contenido = '';
+    }
+    zona.innerHTML = '';
+    zona.appendChild(item);
+    zona.classList.add('ocupado');
+    zona.dataset.contenido = item.dataset.valor;
+    return true;
+  });
+
+  document.getElementById('btn-confirmar-caso3').addEventListener('click', function(){
+    var fb = document.getElementById('feedback-caso3');
+    var slots = Array.prototype.slice.call(document.querySelectorAll('#caso3 .slot-secuencia'));
+    var ordenActual = slots.map(function(s){ return s.dataset.contenido || ''; });
+    var ordenCorrecto = ['diseno', 'impresion', 'publicacion'];
+    var secuenciaOk = ordenActual.every(function(v, i){ return v === ordenCorrecto[i]; });
+
+    var mapaEsperado = {
+      vectorial: ['diseno', 'impresion'],
+      raster: ['diseno', 'publicacion'],
+      video: ['publicacion']
+    };
+    var matrizOk = true;
+    document.querySelectorAll('#caso3 .matriz-check').forEach(function(chk){
+      var esperado = mapaEsperado[chk.dataset.formato].indexOf(chk.dataset.fase) !== -1;
+      if (chk.checked !== esperado) matrizOk = false;
+    });
+
+    if (secuenciaOk && matrizOk) {
+      fb.innerHTML = panelExito('¡Muy bien! Has reconstruido la cadena del proceso. Al igual que Holmes, utilizaste las relaciones entre los elementos para descubrir el orden.');
+      estado.secuenciaCaso3 = ordenActual;
+      estado.casosCompletos[3] = true;
+      actualizarProgreso();
+      document.getElementById('siguiente-caso3').style.display = 'block';
+    } else {
+      fb.innerHTML = panelError(
+        'La cadena presenta una inconsistencia. Analiza qué sucede primero: ¿se produce el diseño, se imprime el producto o se publica el contenido?',
+        'Un vectorial suele intervenir en diseño e impresión; un ráster, en diseño y publicación; un video, solo en publicación.',
+        'Revisa tanto el orden de las tres posiciones como las casillas marcadas en la tabla.'
+      );
+    }
+  });
+
+  document.getElementById('btn-siguiente3').addEventListener('click', function(){
+    desbloquear('caso4');
+    marcarPasoActivo('4');
+  });
+})();
+
+(function initCaso4(){
+  var srcCanvas = document.createElement('canvas');
+  srcCanvas.width = 24; srcCanvas.height = 24;
+  var sctx = srcCanvas.getContext('2d');
+  sctx.fillStyle = '#a6d2ec'; sctx.fillRect(0,0,24,24);
+  sctx.fillStyle = '#5b4b8a'; sctx.beginPath(); sctx.arc(10,10,6,0,Math.PI*2); sctx.fill();
+  sctx.strokeStyle = '#5b4b8a'; sctx.lineWidth = 3; sctx.lineCap = 'round';
+  sctx.beginPath(); sctx.moveTo(15,15); sctx.lineTo(21,21); sctx.stroke();
+
+  var cv = document.getElementById('canvasSimulador');
+  var ctx = cv.getContext('2d');
+  var rango = document.getElementById('rango-simulador');
+  var etiqueta = document.getElementById('valorEscala');
+
+  function pintar(valor){
+    ctx.imageSmoothingEnabled = false;
+    ctx.fillStyle = '#dfe9f2';
+    ctx.fillRect(0,0,cv.width,cv.height);
+    var factor = valor / 100;
+    var size = Math.round(24 * factor * 4);
+    var offset = (cv.width - size) / 2;
+    ctx.drawImage(srcCanvas, 0, 0, 24, 24, offset, offset, size, size);
+    var descripcion = 'nítido para su tamaño original';
+    if (valor > 100 && valor <= 200) descripcion = 'leve pérdida de definición';
+    else if (valor > 200 && valor <= 300) descripcion = 'pérdida notoria de definición';
+    else if (valor > 300) descripcion = 'pixelado, no apto para impresión';
+    etiqueta.textContent = valor + '% — ' + descripcion;
+  }
+  pintar(100);
+  rango.addEventListener('input', function(){ pintar(Number(rango.value)); });
+
+  document.getElementById('btn-confirmar-caso4').addEventListener('click', function(){
+    var elegida = document.querySelector('input[name="op4"]:checked');
+    var fb = document.getElementById('feedback-caso4');
+    if (!elegida) {
+      fb.innerHTML = panelError('Primero elige una opción.', 'El testigo dio cuatro versiones; solo una explica el problema técnico.', 'Observa lo que ocurrió en el simulador al superar el 100%.');
+      return;
+    }
+    if (elegida.value === 'b') {
+      fb.innerHTML = panelExito('¡Has encontrado la inconsistencia! El problema no está en la intención del diseñador, sino en la relación entre resolución, dimensiones y destino del archivo.');
+      estado.casosCompletos[4] = true;
+      actualizarProgreso();
+      document.getElementById('siguiente-caso4').style.display = 'block';
+    } else {
+      fb.innerHTML = panelError(
+        'Observa nuevamente la evidencia. ¿Qué evidencia técnica, y no personal, explica la pérdida de calidad?',
+        'La resolución de una imagen ráster es fija; ampliar el tamaño sin ajustarla estira los mismos píxeles sobre más espacio.',
+        'Por eso el simulador mostró bloques cada vez más visibles al aumentar la escala.'
+      );
+    }
+  });
+
+  document.getElementById('btn-siguiente4').addEventListener('click', function(){
+    desbloquear('caso5');
+    marcarPasoActivo('5');
+  });
+})();
+
+var fragmentosCaso5 = ['VIDEO', 'REDES SOCIALES', 'FORMATO DIGITAL', 'PUBLICACIÓN'];
+
+(function initCaso5(){
+  var origen = document.getElementById('fragmentos-origen-caso5');
+  var barajados = fragmentosCaso5.slice().sort(function(){ return Math.random() - 0.5; });
+  barajados.forEach(function(txt, i){
+    var col = document.createElement('div');
+    col.className = 'col-md-3 col-6';
+    col.innerHTML = '<div class="pista-card text-center" id="frag' + i + '" data-valor="' + txt + '">' + txt + '</div>';
+    origen.appendChild(col);
+  });
+
+  var items = Array.prototype.slice.call(document.querySelectorAll('#caso5 .pista-card'));
+  var zonas = Array.prototype.slice.call(document.querySelectorAll('#caso5 .slot-secuencia'));
+
+  habilitarArrastreYToque(items, zonas, function(item, zona){
+    if (zona.dataset.contenido) return false;
+    var slotAnterior = item.parentElement.classList.contains('slot-secuencia') ? item.parentElement : null;
+    if (slotAnterior) { slotAnterior.classList.remove('ocupado'); slotAnterior.dataset.contenido = ''; }
+    zona.innerHTML = '';
+    zona.appendChild(item);
+    zona.classList.add('ocupado');
+    zona.dataset.contenido = item.dataset.valor;
+    return true;
+  });
+
+  document.getElementById('btn-confirmar-caso5a').addEventListener('click', function(){
+    var slots = Array.prototype.slice.call(document.querySelectorAll('#caso5 .slot-secuencia'));
+    var actual = slots.map(function(s){ return s.dataset.contenido || ''; });
+    var correcto = actual.every(function(v, i){ return v === fragmentosCaso5[i]; });
+    var fb = document.getElementById('feedback-caso5a');
+    if (correcto) {
+      fb.innerHTML = panelExito('¡Mensaje descifrado! Has reorganizado correctamente las pistas y determinado que el recurso pertenece a la fase de publicación digital.');
+      document.getElementById('bloque-anagrama').style.display = 'block';
+    } else {
+      fb.innerHTML = panelError(
+        'El mensaje aún no tiene sentido. Observa: ¿qué recurso se menciona primero, y a través de qué canal llega finalmente al público?',
+        'El orden lógico avanza del tipo de recurso hacia su formato y, finalmente, hacia el canal y la fase de destino.',
+        'Vuelve a colocar los cuatro fragmentos en las cuatro posiciones.'
+      );
+    }
+  });
+
+  var palabraAnagrama = 'PUBLICACION';
+  var mezclada = palabraAnagrama.split('').sort(function(){ return Math.random() - 0.5; }).join('');
+  document.getElementById('anagrama-mezclado').textContent = mezclada;
+
+  document.getElementById('btn-confirmar-anagrama').addEventListener('click', function(){
+    var valor = normalizar(document.getElementById('input-anagrama').value);
+    var fb = document.getElementById('feedback-anagrama');
+    if (valor === palabraAnagrama) {
+      fb.innerHTML = panelExito('Término descifrado: <strong>Publicación</strong>. Es la fase de distribución del recurso gráfico a través de un canal físico o digital, para que llegue finalmente a su público.');
+      estado.casosCompletos[5] = true;
+      actualizarProgreso();
+      document.getElementById('siguiente-caso5').style.display = 'block';
+    } else {
+      fb.innerHTML = '<div class="panel-feedback error"><p class="mb-0">Aún no coincide. Pista: son once letras y la palabra nombra la fase final del proceso. Vuelve a intentarlo.</p></div>';
+    }
+  });
+
+  document.getElementById('btn-siguiente5').addEventListener('click', function(){
+    desbloquear('casofinal');
+    marcarPasoActivo('6');
+  });
+})();
+
+function textoCampo(id){
+  var el = document.getElementById(id);
+  return el ? (el.value || '').trim() : '';
+}
+
+function nombreFase(clave){
+  var mapa = { diseno:'Diseño', impresion:'Impresión', publicacion:'Publicación', descartar:'Descartada (no era evidencia)' };
+  return mapa[clave] || 'Sin ubicar';
+}
+
+function estadoCasoTexto(n){
+  return estado.casosCompletos[n] ? '✅ Resuelto' : '⏳ Pendiente';
+}
+
+function descargarArchivo(nombre, contenido, tipo){
+  var blob = new Blob([contenido], { type: tipo });
+  var url = URL.createObjectURL(blob);
+  var enlace = document.createElement('a');
+  enlace.href = url;
+  enlace.download = nombre;
+  document.body.appendChild(enlace);
+  enlace.click();
+  document.body.removeChild(enlace);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+}
+
+function generarMarkdownExpediente(){
+  var l = [];
+  l.push('# Expediente del caso: Tras las Pistas del Proceso Gráfico');
+  l.push('');
+  l.push('**Instituto de Educación Superior Pública "Diseño y Comunicación"**');
+  l.push('');
+  l.push('Curso: Unidad didáctica de Producción y publicación de piezas gráficas · 2026 · Semana 1');
+  l.push('Docente: Mg Mario Quiroz');
+  l.push('');
+  l.push('## Equipo investigador');
+  l.push('');
+  l.push('| N.° | Nombres | Apellidos | Correo |');
+  l.push('|---|---|---|---|');
+  l.push('| 1 | ' + (textoCampo('eq1-nombres') || '—') + ' | ' + (textoCampo('eq1-apellidos') || '—') + ' | ' + (textoCampo('eq1-correo') || '—') + ' |');
+  l.push('| 2 | ' + (textoCampo('eq2-nombres') || '—') + ' | ' + (textoCampo('eq2-apellidos') || '—') + ' | ' + (textoCampo('eq2-correo') || '—') + ' |');
+  l.push('');
+  l.push('Fecha de cierre del expediente: ' + new Date().toLocaleDateString('es-PE', { year:'numeric', month:'long', day:'numeric' }));
+  l.push('');
+  l.push('---');
+  l.push('');
+
+  l.push('## Caso 1 · La primera deducción');
+  l.push('');
+  l.push('Estado: ' + estadoCasoTexto(1));
+  l.push('');
+  l.push('| Pista | Fase asignada por el equipo |');
+  l.push('|---|---|');
+  document.querySelectorAll('#caso1 .pista-card').forEach(function(item){
+    var texto = (item.childNodes[0] ? item.childNodes[0].textContent : item.textContent).trim();
+    l.push('| ' + texto.replace(/\|/g, '/') + ' | ' + nombreFase(item.dataset.actual) + ' |');
+  });
+  l.push('');
+
+  l.push('## Caso 2 · Un problema iluminador');
+  l.push('');
+  l.push('Estado: ' + estadoCasoTexto(2));
+  var elegido2 = document.querySelector('#sospechosos-caso2 .suspect-card.elegido');
+  var etiquetasFormato = { vectorial:'Vectorial', raster:'Ráster', video:'Video' };
+  l.push('');
+  l.push('Formato elegido: ' + (elegido2 ? etiquetasFormato[elegido2.dataset.valor] : 'Sin responder'));
+  l.push('');
+  l.push('Justificación del equipo:');
+  l.push('');
+  l.push('> ' + (textoCampo('justificacion-caso2') || '(sin justificación registrada)'));
+  l.push('');
+
+  l.push('## Caso 3 · El engaño del dominó');
+  l.push('');
+  l.push('Estado: ' + estadoCasoTexto(3));
+  var slots3 = Array.prototype.slice.call(document.querySelectorAll('#caso3 .slot-secuencia'));
+  var secuencia3 = slots3.map(function(s){ return s.dataset.contenido ? nombreFase(s.dataset.contenido) : 'Sin completar'; }).join(' → ');
+  l.push('');
+  l.push('Secuencia reconstruida: ' + secuencia3);
+  l.push('');
+  l.push('Relación formato–fase marcada por el equipo:');
+  l.push('');
+  ['vectorial', 'raster', 'video'].forEach(function(f){
+    var fases = [];
+    document.querySelectorAll('.matriz-check[data-formato="' + f + '"]').forEach(function(chk){
+      if (chk.checked) fases.push(nombreFase(chk.dataset.fase));
+    });
+    l.push('- ' + etiquetasFormato[f] + ': ' + (fases.length ? fases.join(', ') : 'sin marcar'));
+  });
+  l.push('');
+
+  l.push('## Caso 4 · Una historia probable');
+  l.push('');
+  l.push('Estado: ' + estadoCasoTexto(4));
+  var opcion4 = document.querySelector('input[name="op4"]:checked');
+  l.push('');
+  l.push('Escala usada en el simulador al cerrar el expediente: ' + document.getElementById('rango-simulador').value + '%');
+  l.push('');
+  l.push('Evidencia seleccionada: ' + (opcion4 ? opcion4.parentElement.textContent.trim() : 'Sin responder'));
+  l.push('');
+
+  l.push('## Caso 5 · Un mensaje codificado');
+  l.push('');
+  l.push('Estado: ' + estadoCasoTexto(5));
+  var slots5 = Array.prototype.slice.call(document.querySelectorAll('#caso5 .slot-secuencia'));
+  var mensaje5 = slots5.map(function(s){ return s.dataset.contenido || '—'; }).join(' — ');
+  l.push('');
+  l.push('Mensaje reconstruido: ' + mensaje5);
+  l.push('');
+  l.push('Término del anagrama resuelto: ' + (textoCampo('input-anagrama') || 'Sin responder'));
+  l.push('');
+
+  l.push('## Caso final · El expediente Sherlock Holmes');
+  l.push('');
+  l.push('¿Dónde usarías este razonamiento en tu futuro trabajo como diseñador o comunicador?');
+  l.push('');
+  l.push('> ' + (textoCampo('reflexion-transferencia') || '(sin respuesta)'));
+  l.push('');
+  l.push('Dos hallazgos y una duda que deja el caso:');
+  l.push('');
+  l.push('> ' + (textoCampo('reflexion-hallazgos') || '(sin respuesta)'));
+  l.push('');
+  l.push('Autoevaluación del detective (1 = inicial · 4 = dominado):');
+  l.push('');
+  var etiquetasRubrica = { observacion:'Observación', preguntas:'Preguntas', deduccion:'Deducción', decision:'Decisión' };
+  document.querySelectorAll('#autoevaluacion [data-rubrica]').forEach(function(r){
+    l.push('- ' + etiquetasRubrica[r.dataset.rubrica] + ': ' + r.value + ' / 4');
+  });
+  l.push('');
+  l.push('---');
+  l.push('');
+  l.push('Docente: Mg Mario Quiroz | Curso: Unidad didáctica de Producción y publicación de piezas gráficas · 2026 · Semana 1');
+  l.push('');
+  l.push('Instituto de Educación Superior Pública "Diseño y Comunicación"');
+
+  return l.join('\n');
+}
+
+(function initEquipoYFinal(){
+  document.getElementById('btn-iniciar').addEventListener('click', function(){
+    desbloquear('caso1');
+    marcarPasoActivo('1');
+  });
+
+  document.getElementById('btn-cerrar-expediente').addEventListener('click', function(){
+    var n1 = document.getElementById('eq1-nombres').value || '—';
+    var a1 = document.getElementById('eq1-apellidos').value || '—';
+    var n2 = document.getElementById('eq2-nombres').value || '—';
+    var a2 = document.getElementById('eq2-apellidos').value || '—';
+    document.getElementById('resumen-equipo').textContent = 'Equipo: ' + n1 + ' ' + a1 + ' · ' + n2 + ' ' + a2;
+    document.getElementById('resumen-fecha').textContent = 'Expediente cerrado el ' + new Date().toLocaleDateString('es-PE', { year:'numeric', month:'long', day:'numeric' });
+    document.getElementById('resumen-expediente').style.display = 'block';
+    document.getElementById('btn-imprimir').style.display = 'inline-block';
+    document.getElementById('btn-markdown').style.display = 'inline-block';
+    estado.casosCompletos.final = true;
+    actualizarProgreso();
+  });
+
+  document.getElementById('btn-imprimir').addEventListener('click', function(){
+    window.print();
+  });
+
+  document.getElementById('btn-markdown').addEventListener('click', function(){
+    descargarArchivo('expediente-tras-las-pistas.md', generarMarkdownExpediente(), 'text/markdown;charset=utf-8');
+  });
+})();
+
+actualizarProgreso();
+</script>
+</body>
+</html>
