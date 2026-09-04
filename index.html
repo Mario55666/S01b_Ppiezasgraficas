@@ -152,8 +152,54 @@ h1,h2,h3,.font-display{
 }
 .panel-feedback.acierto{background:rgba(63,125,92,.13);border:1px solid rgba(63,125,92,.4);color:#2c5c42;}
 .panel-feedback.error{background:rgba(168,72,63,.1);border:1px solid rgba(168,72,63,.35);color:#7c342c;}
+.panel-feedback.cercano{background:rgba(224,123,61,.13);border:1px solid rgba(224,123,61,.4);color:#7c4a24;}
 .panel-feedback .paso-fb{margin-bottom:.4rem;}
 .panel-feedback .paso-fb b{color:var(--violeta-profundo);}
+.btn-reiniciar-pregunta{margin-top:.7rem;}
+.contenedor-fuegos{position:fixed;inset:0;z-index:1600;pointer-events:none;overflow:hidden;}
+.destello-festejo{
+  position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 35%, rgba(255,250,244,.85), rgba(255,216,179,.35) 40%, transparent 70%);
+  opacity:0;
+  animation: destello-boom .55s ease-out forwards;
+}
+@keyframes destello-boom{
+  0%{opacity:0;}
+  12%{opacity:1;}
+  100%{opacity:0;}
+}
+.firework {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 0.9vmin;
+  aspect-ratio: 1;
+  background:
+      /* el fondo vacío a propósito: cada chispa recibe su color y su brillo por JS */
+    ;
+  background-size: 0.9vmin 0.9vmin;
+  background-repeat: no-repeat;
+  border-radius: 50%;
+  animation: vuelo-chispa .9s cubic-bezier(.15,.7,.3,1) forwards;
+}
+@keyframes vuelo-chispa{
+  0%{transform:translate(-50%,-50%) translate(0,0) scale(.3);opacity:0;}
+  10%{transform:translate(-50%,-50%) translate(0,0) scale(1.6);opacity:1;}
+  55%{opacity:1;}
+  100%{transform:translate(-50%,-50%) translate(var(--dx,0),var(--dy,0)) scale(.15);opacity:0;}
+}
+.chispa-animo{
+  position:fixed;z-index:1600;pointer-events:none;
+  font-family:'Playfair Display',serif;font-style:italic;font-weight:600;
+  color:var(--naranja-acento);font-size:1.3rem;white-space:nowrap;
+  animation: subir-animo 1.1s ease-out forwards;
+}
+@keyframes subir-animo{
+  0%{transform:translateY(0) scale(.6);opacity:0;}
+  25%{opacity:1;transform:translateY(-8px) scale(1.08);}
+  100%{transform:translateY(-48px) scale(1);opacity:0;}
+}
 .badge-fase-final{
   background:linear-gradient(135deg,var(--azul-estructura),var(--violeta));
   color:#fff;border-radius:16px;padding:.6rem 1.1rem;font-family:'Playfair Display',serif;font-style:italic;
@@ -334,7 +380,8 @@ footer.pie-inst .inst-nombre{font-family:'Playfair Display',serif;font-style:ita
     <div class="tarjeta-bruma p-4 p-md-5">
       <p class="rotulo-caso">Caso 1 · La primera deducción</p>
       <h2 class="h3">Identificación y relación de pistas</h2>
-      <p><strong>Instrucción:</strong> Holmes recibió cinco notas sobre un mismo proyecto gráfico. Solo tres son evidencia real; las otras dos son ruido de investigación. Arrastra (o toca y luego toca el destino) cada pista hacia la fase del proceso que le corresponde, o descártala si no aporta nada al caso.</p>
+      <p><strong>Instrucción:</strong> Holmes recibió cinco notas sobre un mismo proyecto gráfico. Solo tres son evidencia real; las otras dos son ruido de investigación.</p>
+      <p><strong>Cómo se juega:</strong> abajo verás las cinco tarjetas-pista y, más abajo, cuatro zonas: <em>Diseño</em>, <em>Impresión</em>, <em>Publicación</em> y <em>Descartar</em>. Por cada tarjeta, primero decide a qué zona pertenece y luego muévela: en computadora, arrástrala con el mouse hasta la zona elegida; en pantalla táctil, toca la tarjeta para seleccionarla (queda resaltada) y luego toca la zona de destino para soltarla ahí. Repite la operación con las cinco tarjetas, una por una, hasta que ninguna quede en el área de origen. <strong>Importante:</strong> una misma zona puede recibir más de una tarjeta; de hecho, la zona <em>Descartar</em> es la única que recibirá dos, porque dos de las cinco notas no son evidencia real. Las otras tres zonas (Diseño, Impresión y Publicación) reciben una tarjeta cada una. Cuando las cinco estén ubicadas, pulsa «Confirmar deducción» para que Holmes revise tu trabajo.</p>
       <button type="button" class="btn-ayuda no-imprimir" data-pista="1">💡 Pedir una pista al docente</button>
       <div class="row g-3 mt-2" id="pistas-origen-caso1"></div>
       <div class="row g-3 mt-4">
@@ -421,6 +468,7 @@ footer.pie-inst .inst-nombre{font-family:'Playfair Display',serif;font-style:ita
       <p><strong>Instrucción:</strong> Igual que Holmes dedujo el orden de una cadena de dominós sin verla armarse, debes reconstruir la secuencia del proceso gráfico a partir de las relaciones entre sus elementos.</p>
       <button type="button" class="btn-ayuda no-imprimir" data-pista="3">💡 Pedir una pista al docente</button>
       <p class="fw-semibold mb-2 mt-3">Paso A · Ordena la cadena del proceso</p>
+      <p class="mb-2">Verás tres fichas (Diseño, Impresión, Publicación) y tres posiciones vacías. Arrastra cada ficha a la posición que le corresponde en la línea de tiempo del proceso (o, en pantalla táctil, toca la ficha y luego toca la posición). A diferencia del Caso 1, aquí cada posición admite <strong>una sola ficha</strong>: si una posición ya está ocupada, no podrás soltar otra encima hasta liberarla.</p>
       <div class="row g-3" id="fichas-secuencia-origen"></div>
       <div class="row g-3 mt-1">
         <div class="col-md-4"><div class="slot-secuencia" data-slot="0">Posición 1</div></div>
@@ -429,6 +477,7 @@ footer.pie-inst .inst-nombre{font-family:'Playfair Display',serif;font-style:ita
       </div>
 
       <p class="fw-semibold mb-2 mt-4">Paso B · Relaciona cada formato con la(s) fase(s) donde interviene</p>
+      <p class="mb-2">En la tabla, marca con un clic cada casilla que corresponda: un mismo formato (fila) puede intervenir en más de una fase (columna), así que puedes marcar varias casillas por fila cuando corresponda.</p>
       <div class="table-responsive">
         <table class="table matriz-tabla">
           <thead><tr><th>Formato</th><th>Diseño</th><th>Impresión</th><th>Publicación</th></tr></thead>
@@ -489,6 +538,7 @@ footer.pie-inst .inst-nombre{font-family:'Playfair Display',serif;font-style:ita
       <p class="rotulo-caso">Caso 5 · Un mensaje codificado</p>
       <h2 class="h3">Interpretación para publicación digital</h2>
       <p><strong>Instrucción:</strong> Un mensaje llegó con el orden alterado. Reorganiza los fragmentos para descifrarlo.</p>
+      <p class="mb-2"><strong>Cómo se juega:</strong> hay cuatro fragmentos de texto y cuatro posiciones numeradas (1 a 4). Arrastra cada fragmento a la posición donde debería ir dentro del mensaje (o tócalo y luego toca la posición). Igual que en el Caso 3, cada posición admite un único fragmento: el orden correcto avanza del recurso mencionado, a su formato, al canal de difusión y, por último, a la fase del proceso.</p>
       <button type="button" class="btn-ayuda no-imprimir" data-pista="5a">💡 Pedir una pista al docente</button>
       <div class="row g-3 mt-2" id="fragmentos-origen-caso5"></div>
       <div class="row g-2 mt-1">
@@ -765,14 +815,95 @@ function marcarPasoActivo(n){
 function panelExito(html){
   return '<div class="panel-feedback acierto">' + html + '</div>';
 }
-function panelError(pista, dato, contexto){
+function panelCercano(mensaje){
+  return '<div class="panel-feedback cercano">' +
+    '<p class="paso-fb mb-0"><b>¡Casi lo resuelves!</b> ' + mensaje + '</p>' +
+  '</div>';
+}
+function panelError(pista, dato, contexto, idFuncionReiniciar){
+  var boton = idFuncionReiniciar ? '<button type="button" class="btn btn-secundario-det btn-reiniciar-pregunta" onclick="' + idFuncionReiniciar + '()">🔄 Reiniciar esta pregunta</button>' : '';
   return '<div class="panel-feedback error">' +
     '<p class="paso-fb"><b>Pausa.</b> Aún no, pero vas por buen camino.</p>' +
     '<p class="paso-fb"><b>Pista.</b> ' + pista + '</p>' +
     '<p class="paso-fb"><b>Dato clave.</b> ' + dato + '</p>' +
     '<p class="paso-fb"><b>Contexto.</b> ' + contexto + '</p>' +
     '<p class="paso-fb mb-0"><b>Reintento.</b> Vuelve a responder con esta pista en mente.</p>' +
+    boton +
   '</div>';
+}
+
+function lanzarFestejo(elementoAncla){
+  var origen = elementoAncla.getBoundingClientRect();
+  var vw = window.innerWidth;
+  var vh = window.innerHeight;
+  var contenedor = document.createElement('div');
+  contenedor.className = 'contenedor-fuegos';
+  document.body.appendChild(contenedor);
+
+  var destello = document.createElement('div');
+  destello.className = 'destello-festejo';
+  contenedor.appendChild(destello);
+
+  var colores = ['#ffd8b3', '#e07b3d', '#a6d2ec', '#cdbde9', '#3f7d5c', '#5b4b8a', '#ffffff'];
+
+  function explotar(cx, cy, cantidad, radioMin, radioMax){
+    for (var i = 0; i < cantidad; i++) {
+      var chispa = document.createElement('span');
+      chispa.className = 'firework';
+      var angulo = (Math.PI * 2) * (i / cantidad) + (Math.random() * 0.4);
+      var distancia = radioMin + Math.random() * (radioMax - radioMin);
+      var dx = Math.cos(angulo) * distancia;
+      var dy = Math.sin(angulo) * distancia;
+      var color = colores[Math.floor(Math.random() * colores.length)];
+      chispa.style.left = cx + 'px';
+      chispa.style.top = cy + 'px';
+      chispa.style.background = 'radial-gradient(circle, #fffaf3 0%, ' + color + ' 40%, transparent 75%)';
+      chispa.style.filter = 'drop-shadow(0 0 5px ' + color + ') drop-shadow(0 0 10px ' + color + ')';
+      chispa.style.setProperty('--dx', dx + 'px');
+      chispa.style.setProperty('--dy', dy + 'px');
+      chispa.style.animationDuration = (0.75 + Math.random() * 0.5) + 's';
+      chispa.style.animationDelay = (Math.random() * 0.12) + 's';
+      contenedor.appendChild(chispa);
+    }
+  }
+
+  // Primera explosión: nace del propio panel de acierto.
+  explotar(origen.left + origen.width / 2, origen.top + 10, 42, 70, 170);
+
+  // Ráfagas adicionales repartidas por la pantalla, como una batería de fuegos artificiales.
+  setTimeout(function(){ explotar(vw * 0.18, vh * 0.3, 48, 90, 210); }, 180);
+  setTimeout(function(){ explotar(vw * 0.82, vh * 0.24, 48, 90, 210); }, 360);
+  setTimeout(function(){ explotar(vw * 0.5, vh * 0.16, 58, 110, 240); }, 540);
+  setTimeout(function(){ explotar(vw * 0.35, vh * 0.4, 40, 80, 180); }, 720);
+  setTimeout(function(){ explotar(vw * 0.65, vh * 0.4, 40, 80, 180); }, 720);
+
+  setTimeout(function(){ contenedor.remove(); }, 2400);
+}
+
+function lanzarAnimoCercania(elementoAncla){
+  var origen = elementoAncla.getBoundingClientRect();
+  var mensajes = ['¡Casi!', '¡Muy cerca!', '¡Vas bien, detective!', '¡Un detalle más!'];
+  var globo = document.createElement('div');
+  globo.className = 'chispa-animo';
+  globo.textContent = '✨ ' + mensajes[Math.floor(Math.random() * mensajes.length)];
+  globo.style.left = (origen.left + origen.width / 2 - 40) + 'px';
+  globo.style.top = origen.top + 'px';
+  document.body.appendChild(globo);
+  setTimeout(function(){ globo.remove(); }, 1200);
+}
+
+function distanciaLevenshtein(a, b){
+  var m = a.length, n = b.length;
+  var d = [];
+  for (var i = 0; i <= m; i++) d[i] = [i];
+  for (var j = 0; j <= n; j++) d[0][j] = j;
+  for (i = 1; i <= m; i++){
+    for (j = 1; j <= n; j++){
+      var costo = a[i-1] === b[j-1] ? 0 : 1;
+      d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + costo);
+    }
+  }
+  return d[m][n];
 }
 
 function habilitarArrastreYToque(items, zonas, alColocar){
@@ -841,8 +972,10 @@ var pistasCaso1 = [
   { id:'p5', texto:'La factura del proyecto se canceló en efectivo el martes por la tarde.', zona:'descartar' }
 ];
 
-(function initCaso1(){
+function construirCaso1(){
   var origen = document.getElementById('pistas-origen-caso1');
+  origen.innerHTML = '';
+  document.querySelectorAll('#caso1 .zona-drop .contenido-zona').forEach(function(z){ z.innerHTML = ''; });
   pistasCaso1.forEach(function(p){
     var col = document.createElement('div');
     col.className = 'col-md-4 col-sm-6';
@@ -858,8 +991,18 @@ var pistasCaso1 = [
     item.dataset.actual = zona.dataset.zona;
     return true;
   });
+}
+
+window.resetCaso1 = function(){
+  construirCaso1();
+  document.getElementById('feedback-caso1').innerHTML = '';
+};
+
+(function initCaso1(){
+  construirCaso1();
 
   document.getElementById('btn-confirmar-caso1').addEventListener('click', function(){
+    var items = Array.prototype.slice.call(document.querySelectorAll('#caso1 .pista-card'));
     var total = pistasCaso1.length;
     var correctas = 0;
     items.forEach(function(item){
@@ -871,11 +1014,16 @@ var pistasCaso1 = [
       estado.casosCompletos[1] = true;
       actualizarProgreso();
       document.getElementById('siguiente-caso1').style.display = 'block';
+      lanzarFestejo(fb);
+    } else if (correctas === total - 1) {
+      fb.innerHTML = panelCercano('Solo una pista está en el lugar equivocado. Revisa cada zona una vez más: estás a un paso de cerrar el caso.');
+      lanzarAnimoCercania(fb);
     } else {
       fb.innerHTML = panelError(
         'La deducción todavía no es correcta. Observa nuevamente la pista y pregúntate: ¿qué ocurre con este recurso durante el proceso?',
         'Tienes ' + correctas + ' de ' + total + ' pistas bien ubicadas. Dos de las cinco notas son ruido y no pertenecen a ninguna fase.',
-        'Las pistas reales describen características del recurso, el formato del archivo o el canal donde se usará.'
+        'Las pistas reales describen características del recurso, el formato del archivo o el canal donde se usará.',
+        'resetCaso1'
       );
     }
   });
@@ -897,6 +1045,13 @@ var pistasCaso1 = [
     });
   });
 
+  window.resetCaso2 = function(){
+    tarjetas.forEach(function(x){ x.classList.remove('elegido'); });
+    elegido = null;
+    document.getElementById('feedback-caso2').innerHTML = '';
+    document.getElementById('revelacion-caso2').style.display = 'none';
+  };
+
   document.getElementById('btn-confirmar-caso2').addEventListener('click', function(){
     var fb = document.getElementById('feedback-caso2');
     if (!elegido) {
@@ -909,11 +1064,13 @@ var pistasCaso1 = [
       estado.casosCompletos[2] = true;
       actualizarProgreso();
       document.getElementById('siguiente-caso2').style.display = 'block';
+      lanzarFestejo(fb);
     } else {
       fb.innerHTML = panelError(
         'Observa nuevamente la evidencia. ¿Qué característica diferencia a un gráfico vectorial de una imagen ráster?',
         'Lo vectorial se define por ecuaciones matemáticas (paths), no por una cuadrícula fija de píxeles.',
-        'Por eso puede ampliarse o reducirse sin perder nitidez, algo esencial antes de enviar un archivo a imprenta.'
+        'Por eso puede ampliarse o reducirse sin perder nitidez, algo esencial antes de enviar un archivo a imprenta.',
+        'resetCaso2'
       );
     }
   });
@@ -930,8 +1087,18 @@ var fichasCaso3 = [
   { id:'f3', texto:'📡 Publicación', valor:'publicacion' }
 ];
 
-(function initCaso3(){
+function construirCaso3(){
   var origen = document.getElementById('fichas-secuencia-origen');
+  origen.innerHTML = '';
+  var slots = Array.prototype.slice.call(document.querySelectorAll('#caso3 .slot-secuencia'));
+  slots.forEach(function(zona){
+    if (!zona.dataset.label) zona.dataset.label = zona.textContent.trim();
+    zona.textContent = zona.dataset.label;
+    zona.classList.remove('ocupado');
+    zona.dataset.contenido = '';
+  });
+  document.querySelectorAll('#caso3 .matriz-check').forEach(function(chk){ chk.checked = false; });
+
   var barajadas = fichasCaso3.slice().sort(function(){ return Math.random() - 0.5; });
   barajadas.forEach(function(f){
     var col = document.createElement('div');
@@ -941,14 +1108,14 @@ var fichasCaso3 = [
   });
 
   var items = Array.prototype.slice.call(document.querySelectorAll('#caso3 .pista-card'));
-  var zonas = Array.prototype.slice.call(document.querySelectorAll('#caso3 .slot-secuencia'));
 
-  habilitarArrastreYToque(items, zonas, function(item, zona){
+  habilitarArrastreYToque(items, slots, function(item, zona){
     if (zona.dataset.contenido) return false;
     var slotAnterior = item.parentElement.classList.contains('slot-secuencia') ? item.parentElement : null;
     if (slotAnterior) {
       slotAnterior.classList.remove('ocupado');
       slotAnterior.dataset.contenido = '';
+      slotAnterior.textContent = slotAnterior.dataset.label;
     }
     zona.innerHTML = '';
     zona.appendChild(item);
@@ -956,36 +1123,54 @@ var fichasCaso3 = [
     zona.dataset.contenido = item.dataset.valor;
     return true;
   });
+}
+
+window.resetCaso3 = function(){
+  construirCaso3();
+  document.getElementById('feedback-caso3').innerHTML = '';
+};
+
+(function initCaso3(){
+  construirCaso3();
 
   document.getElementById('btn-confirmar-caso3').addEventListener('click', function(){
     var fb = document.getElementById('feedback-caso3');
     var slots = Array.prototype.slice.call(document.querySelectorAll('#caso3 .slot-secuencia'));
     var ordenActual = slots.map(function(s){ return s.dataset.contenido || ''; });
     var ordenCorrecto = ['diseno', 'impresion', 'publicacion'];
-    var secuenciaOk = ordenActual.every(function(v, i){ return v === ordenCorrecto[i]; });
+    var aciertosSecuencia = ordenActual.reduce(function(acc, v, i){ return acc + (v === ordenCorrecto[i] ? 1 : 0); }, 0);
 
     var mapaEsperado = {
       vectorial: ['diseno', 'impresion'],
       raster: ['diseno', 'publicacion'],
       video: ['publicacion']
     };
-    var matrizOk = true;
-    document.querySelectorAll('#caso3 .matriz-check').forEach(function(chk){
+    var checks = Array.prototype.slice.call(document.querySelectorAll('#caso3 .matriz-check'));
+    var aciertosMatriz = 0;
+    checks.forEach(function(chk){
       var esperado = mapaEsperado[chk.dataset.formato].indexOf(chk.dataset.fase) !== -1;
-      if (chk.checked !== esperado) matrizOk = false;
+      if (chk.checked === esperado) aciertosMatriz++;
     });
 
-    if (secuenciaOk && matrizOk) {
+    var totalPuntos = ordenCorrecto.length + checks.length;
+    var aciertosTotales = aciertosSecuencia + aciertosMatriz;
+
+    if (aciertosTotales === totalPuntos) {
       fb.innerHTML = panelExito('¡Muy bien! Has reconstruido la cadena del proceso. Al igual que Holmes, utilizaste las relaciones entre los elementos para descubrir el orden.');
       estado.secuenciaCaso3 = ordenActual;
       estado.casosCompletos[3] = true;
       actualizarProgreso();
       document.getElementById('siguiente-caso3').style.display = 'block';
+      lanzarFestejo(fb);
+    } else if (aciertosTotales >= totalPuntos - 2) {
+      fb.innerHTML = panelCercano('La reconstrucción está casi completa: solo un par de relaciones no encajan todavía. Revisa el orden y la tabla una vez más.');
+      lanzarAnimoCercania(fb);
     } else {
       fb.innerHTML = panelError(
         'La cadena presenta una inconsistencia. Analiza qué sucede primero: ¿se produce el diseño, se imprime el producto o se publica el contenido?',
         'Un vectorial suele intervenir en diseño e impresión; un ráster, en diseño y publicación; un video, solo en publicación.',
-        'Revisa tanto el orden de las tres posiciones como las casillas marcadas en la tabla.'
+        'Revisa tanto el orden de las tres posiciones como las casillas marcadas en la tabla.',
+        'resetCaso3'
       );
     }
   });
@@ -1027,6 +1212,11 @@ var fichasCaso3 = [
   pintar(100);
   rango.addEventListener('input', function(){ pintar(Number(rango.value)); });
 
+  window.resetCaso4 = function(){
+    document.querySelectorAll('input[name="op4"]').forEach(function(r){ r.checked = false; });
+    document.getElementById('feedback-caso4').innerHTML = '';
+  };
+
   document.getElementById('btn-confirmar-caso4').addEventListener('click', function(){
     var elegida = document.querySelector('input[name="op4"]:checked');
     var fb = document.getElementById('feedback-caso4');
@@ -1039,11 +1229,13 @@ var fichasCaso3 = [
       estado.casosCompletos[4] = true;
       actualizarProgreso();
       document.getElementById('siguiente-caso4').style.display = 'block';
+      lanzarFestejo(fb);
     } else {
       fb.innerHTML = panelError(
         'Observa nuevamente la evidencia. ¿Qué evidencia técnica, y no personal, explica la pérdida de calidad?',
         'La resolución de una imagen ráster es fija; ampliar el tamaño sin ajustarla estira los mismos píxeles sobre más espacio.',
-        'Por eso el simulador mostró bloques cada vez más visibles al aumentar la escala.'
+        'Por eso el simulador mostró bloques cada vez más visibles al aumentar la escala.',
+        'resetCaso4'
       );
     }
   });
@@ -1054,10 +1246,19 @@ var fichasCaso3 = [
   });
 })();
 
-var fragmentosCaso5 = ['VIDEO', 'REDES SOCIALES', 'FORMATO DIGITAL', 'PUBLICACIÓN'];
+var fragmentosCaso5 = ['VIDEO', 'FORMATO DIGITAL', 'REDES SOCIALES', 'PUBLICACIÓN'];
 
-(function initCaso5(){
+function construirCaso5(){
   var origen = document.getElementById('fragmentos-origen-caso5');
+  origen.innerHTML = '';
+  var slots = Array.prototype.slice.call(document.querySelectorAll('#caso5 .slot-secuencia'));
+  slots.forEach(function(zona){
+    if (!zona.dataset.label) zona.dataset.label = zona.textContent.trim();
+    zona.textContent = zona.dataset.label;
+    zona.classList.remove('ocupado');
+    zona.dataset.contenido = '';
+  });
+
   var barajados = fragmentosCaso5.slice().sort(function(){ return Math.random() - 0.5; });
   barajados.forEach(function(txt, i){
     var col = document.createElement('div');
@@ -1067,32 +1268,54 @@ var fragmentosCaso5 = ['VIDEO', 'REDES SOCIALES', 'FORMATO DIGITAL', 'PUBLICACI�
   });
 
   var items = Array.prototype.slice.call(document.querySelectorAll('#caso5 .pista-card'));
-  var zonas = Array.prototype.slice.call(document.querySelectorAll('#caso5 .slot-secuencia'));
 
-  habilitarArrastreYToque(items, zonas, function(item, zona){
+  habilitarArrastreYToque(items, slots, function(item, zona){
     if (zona.dataset.contenido) return false;
     var slotAnterior = item.parentElement.classList.contains('slot-secuencia') ? item.parentElement : null;
-    if (slotAnterior) { slotAnterior.classList.remove('ocupado'); slotAnterior.dataset.contenido = ''; }
+    if (slotAnterior) {
+      slotAnterior.classList.remove('ocupado');
+      slotAnterior.dataset.contenido = '';
+      slotAnterior.textContent = slotAnterior.dataset.label;
+    }
     zona.innerHTML = '';
     zona.appendChild(item);
     zona.classList.add('ocupado');
     zona.dataset.contenido = item.dataset.valor;
     return true;
   });
+}
+
+window.resetCaso5 = function(){
+  construirCaso5();
+  document.getElementById('feedback-caso5a').innerHTML = '';
+};
+
+window.resetAnagrama = function(){
+  document.getElementById('input-anagrama').value = '';
+  document.getElementById('feedback-anagrama').innerHTML = '';
+};
+
+(function initCaso5(){
+  construirCaso5();
 
   document.getElementById('btn-confirmar-caso5a').addEventListener('click', function(){
     var slots = Array.prototype.slice.call(document.querySelectorAll('#caso5 .slot-secuencia'));
     var actual = slots.map(function(s){ return s.dataset.contenido || ''; });
-    var correcto = actual.every(function(v, i){ return v === fragmentosCaso5[i]; });
+    var aciertos = actual.reduce(function(acc, v, i){ return acc + (v === fragmentosCaso5[i] ? 1 : 0); }, 0);
     var fb = document.getElementById('feedback-caso5a');
-    if (correcto) {
+    if (aciertos === fragmentosCaso5.length) {
       fb.innerHTML = panelExito('¡Mensaje descifrado! Has reorganizado correctamente las pistas y determinado que el recurso pertenece a la fase de publicación digital.');
       document.getElementById('bloque-anagrama').style.display = 'block';
+      lanzarFestejo(fb);
+    } else if (aciertos === fragmentosCaso5.length - 1) {
+      fb.innerHTML = panelCercano('Un solo fragmento no está en su posición. Revisa el orden: recurso → formato → canal → fase.');
+      lanzarAnimoCercania(fb);
     } else {
       fb.innerHTML = panelError(
         'El mensaje aún no tiene sentido. Observa: ¿qué recurso se menciona primero, y a través de qué canal llega finalmente al público?',
         'El orden lógico avanza del tipo de recurso hacia su formato y, finalmente, hacia el canal y la fase de destino.',
-        'Vuelve a colocar los cuatro fragmentos en las cuatro posiciones.'
+        'Vuelve a colocar los cuatro fragmentos en las cuatro posiciones.',
+        'resetCaso5'
       );
     }
   });
@@ -1109,8 +1332,13 @@ var fragmentosCaso5 = ['VIDEO', 'REDES SOCIALES', 'FORMATO DIGITAL', 'PUBLICACI�
       estado.casosCompletos[5] = true;
       actualizarProgreso();
       document.getElementById('siguiente-caso5').style.display = 'block';
+      lanzarFestejo(fb);
+    } else if (valor && distanciaLevenshtein(valor, palabraAnagrama) <= 2) {
+      fb.innerHTML = panelCercano('Muy cerca: revisa el orden de un par de letras y vuelve a intentarlo.');
+      lanzarAnimoCercania(fb);
     } else {
-      fb.innerHTML = '<div class="panel-feedback error"><p class="mb-0">Aún no coincide. Pista: son once letras y la palabra nombra la fase final del proceso. Vuelve a intentarlo.</p></div>';
+      fb.innerHTML = '<div class="panel-feedback error"><p class="mb-0">Aún no coincide. Pista: son once letras y la palabra nombra la fase final del proceso. Vuelve a intentarlo.</p>' +
+        '<button type="button" class="btn btn-secundario-det btn-reiniciar-pregunta" onclick="resetAnagrama()">🔄 Reiniciar esta pregunta</button></div>';
     }
   });
 
